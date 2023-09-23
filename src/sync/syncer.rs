@@ -49,9 +49,6 @@ fn compare(source_path:&String, dest_path:&String, source: Vec<(String, String)>
         }
     }
 
-    if creations.len() > 0{
-        creations.remove(0);
-    }
     if destructions.len() > 0{
         destructions.remove(0);
     }
