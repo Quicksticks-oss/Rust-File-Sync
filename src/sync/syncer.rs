@@ -61,13 +61,15 @@ pub fn sync(
     dest_path: &String,
     source: (Vec<(String, String)>, Vec<(String, String)>),
     destination: (Vec<(String, String)>, Vec<(String, String)>),
-) {
+) -> i32{
     // Extract source and destination file lists and directories
     let (source_files, source_dirs) = source;
     let (dest_files, destination_dirs) = destination;
 
     let (dir_creations, dir_destructions) = compare(source_path, dest_path, source_dirs, destination_dirs);
     let (file_creations, file_destructions) = compare(source_path, dest_path, source_files, dest_files);
+
+    let mut synced:i32 = 0;
 
     // Create new dirs.
     dir_creations.iter().for_each(|item| {
@@ -86,7 +88,9 @@ pub fn sync(
         let new_dir = item.replace(source_path, dest_path);
         println!("Copy: {} to {}", item, new_dir);
         match fs::copy(item, new_dir.clone()) {
-            Ok(_) => {},
+            Ok(_) => {
+                synced += 1;
+            },
             Err(err) => eprintln!("Error: {}", err),
         }
     });
@@ -100,6 +104,8 @@ pub fn sync(
             Err(e) => eprintln!("Error deleting file: {}", e),
         }
     });
+
+    return synced;
 }
 
 pub fn walk_folder(source_path:&str, callback: &dyn Fn(String, String, String)) -> (Vec<(String, String)>, Vec<(String, String)>){

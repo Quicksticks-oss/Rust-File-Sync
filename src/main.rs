@@ -64,11 +64,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("Time taken to scan: {:.2} seconds", duration.as_secs_f64());
     let start_time = Instant::now();
 
-    syncer::sync(sync_source_path_string, sync_destination_path_string, source_paths, dest_paths);
+    let total_synced:i32 = syncer::sync(sync_source_path_string, sync_destination_path_string, source_paths, dest_paths);
 
     let end_time = Instant::now();
     let duration = end_time - start_time;
     println!("Time taken to sync: {:.2} seconds", duration.as_secs_f64());
+    println!("Synced {} files!", total_synced);
 
     Ok(())
 }
