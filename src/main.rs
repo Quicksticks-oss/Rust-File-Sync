@@ -59,11 +59,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     let source_paths = syncer::walk_folder(sync_source_path, &syncer::default_callback);
     let dest_paths = syncer::walk_folder(sync_destination_path, &syncer::default_callback);
 
+    let end_time = Instant::now();
+    let duration = end_time - start_time;
+    println!("Time taken to scan: {:.2} seconds", duration.as_secs_f64());
+    let start_time = Instant::now();
+
     syncer::sync(sync_source_path_string, sync_destination_path_string, source_paths, dest_paths);
 
     let end_time = Instant::now();
     let duration = end_time - start_time;
-    println!("Time taken: {:.2} seconds", duration.as_secs_f64());
+    println!("Time taken to sync: {:.2} seconds", duration.as_secs_f64());
 
     Ok(())
 }
