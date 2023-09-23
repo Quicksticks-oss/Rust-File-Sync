@@ -1,8 +1,8 @@
 use walkdir::WalkDir;
 use std::fs;
 
-pub fn default_callback(path:String, modified:String, file_name_str:String){
-    println!("Scanning: {} | File{}, Path: {}", modified, file_name_str, path);
+pub fn default_callback(_:String, _:String, file_name_str:String){
+    println!("Scanning: {}", file_name_str);
 }
 
 pub fn create_dir(path:String){
@@ -109,20 +109,27 @@ pub fn walk_folder(source_path:&str, callback: &dyn Fn(String, String, String)) 
     let mut files:Vec<(String, String)> = vec![];
     let mut directories:Vec<(String, String)> = vec![];
     for entry in WalkDir::new(source_path).follow_links(true) {
-        let entry = entry.expect("Could not walk dir.");
-        if entry.file_type().is_file() {
-            let file_name_str: String = entry.file_name().to_string_lossy().into_owned();
-            let full_file_path: String = entry.path().to_string_lossy().into_owned();
-            let file_size = entry.metadata().expect("Could not get metadata.").len(); // Get file size in bytes
-            files.push((full_file_path.clone(), file_size.to_string().clone()));
-            callback(full_file_path, file_size.to_string(), file_name_str);
-        }
-        else if entry.file_type().is_dir() {
-            let file_name_str: String = entry.file_name().to_string_lossy().into_owned();
-            let full_file_path: String = entry.path().to_string_lossy().into_owned();
-            let file_size = entry.metadata().expect("Could not get metadata.").len(); // Get file size in bytes
-            directories.push((full_file_path.clone(), file_name_str.clone()));
-            callback(full_file_path, file_size.to_string(), file_name_str);
+        match entry {
+            Ok(entry) => {
+                if entry.file_type().is_file() {
+                    let file_name_str: String = entry.file_name().to_string_lossy().into_owned();
+                    let full_file_path: String = entry.path().to_string_lossy().into_owned();
+                    let file_size = entry.metadata().expect("Could not get metadata.").len(); // Get file size in bytes
+                    files.push((full_file_path.clone(), file_size.to_string().clone()));
+                    callback(full_file_path, file_size.to_string(), file_name_str);
+                }
+                else if entry.file_type().is_dir() {
+                    let file_name_str: String = entry.file_name().to_string_lossy().into_owned();
+                    let full_file_path: String = entry.path().to_string_lossy().into_owned();
+                    let file_size = entry.metadata().expect("Could not get metadata.").len(); // Get file size in bytes
+                    directories.push((full_file_path.clone(), file_name_str.clone()));
+                    callback(full_file_path, file_size.to_string(), file_name_str);
+                }
+            }
+            Err(err) => {
+                // Handle the error here, e.g., print the error message
+                eprintln!("Error: {}", err);
+            }
         }
     }
     return (files, directories);
