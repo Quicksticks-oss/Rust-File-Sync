@@ -34,6 +34,7 @@ fn print_help() {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
+    println!("Made by: https://github.com/Quicksticks-oss");
     let args: Vec<String> = env::args().collect();
     if args.len() != 3 {
         print_help();
